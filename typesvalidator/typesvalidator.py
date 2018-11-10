@@ -1,6 +1,6 @@
 import inspect
 
-def TypesValidator(value=True):
+def validator(value=True):
     def _validar(f):
         def wrapper(*args, **kwargs):
             ret = inspect.signature(f).return_annotation
