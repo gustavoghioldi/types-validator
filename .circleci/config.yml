@@ -1,0 +1,47 @@
+# Python CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-python/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      - image: cloudreach/sceptre-circleci:0.2
+
+    steps:
+      - checkout
+
+      - run:
+          name: 'Creating Virtualenv'
+          command: virtualenv venv
+      
+      - run:
+          name: install dependencies
+          command: |
+            . ./venv/bin/activate
+            python -m pip install --upgrade setuptools wheel
+      
+      - run:
+          name: setup
+          command: |
+            . ./venv/bin/activate
+            python setup.py sdist bdist_wheel
+
+      - run:
+          name: install twine
+          command: |
+            . ./venv/bin/activate
+            python -m pip install  --upgrade twine
+  
+      - run:
+          name: setup enviroment
+          command: |
+            echo -e "[pypi]" >> ~/.pypirc
+            echo -e "username = $PYPI_USERNAME" >> ~/.pypirc
+            echo -e "password = $PYPI_PASSWORD" >> ~/.pypirc
+
+      - run:
+          name: upload
+          command: |
+            . ./venv/bin/activate
+            twine upload dist/*
